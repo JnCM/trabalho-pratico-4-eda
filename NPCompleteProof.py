@@ -198,13 +198,17 @@ def backtracking_3colorable(G: dict, C: list, idx_vertex: int, init: int):
     # Condição de parada: Atingir o último
     # vértice colorido do caso-base
     if idx_vertex == init:
-        for v in G["V"]:
-            print(v)
-    else:
-        for color in C:
-            if is_safe(G, idx_vertex, color):
-                G["V"][idx_vertex].set_color(color)
-                backtracking_3colorable(G, C, idx_vertex - 1, init)
+        return True
+    
+    for color in C:
+        if is_safe(G, idx_vertex, color):
+            G["V"][idx_vertex].set_color(color)
+            if backtracking_3colorable(G, C, idx_vertex - 1, init):
+                return True
+            G["V"][idx_vertex].set_color("")
+    
+    return False
+
 
 def Aq(Iq: tuple) -> dict:
     """
@@ -227,7 +231,10 @@ def Aq(Iq: tuple) -> dict:
     G["V"][1].set_color(False)
     G["V"][2].set_color(None)
     
-    backtracking_3colorable(G, C, len(G["V"]) - 1, 2)
+    if backtracking_3colorable(G, C, len(G["V"]) - 1, 2):
+        for v in G["V"]:
+            print(v)
+    
     return G
 
 def f2(Sq: dict) -> bool:
@@ -250,9 +257,8 @@ def f2(Sq: dict) -> bool:
     Sp = []
 
     for v in Sq["V"]:
-        if v.get_name() not in not_literals:
-            if v.get_color():
-                Sp.append(v.get_name())
+        if v.get_name() not in not_literals and v.get_color():
+            Sp.append(v.get_name())
 
     return Sp
 
