@@ -1,1 +1,0 @@
-(u OR ~v OR w) AND (v OR x OR ~y)
