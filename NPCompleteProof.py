@@ -78,7 +78,7 @@ def f1(Ip: str) -> tuple:
             index_literal2 = search_literal(graph, literals_of_c[1])
             index_literal3 = search_literal(graph, literals_of_c[2])
             
-            create_OR_gate(graph, index_vertex, index_literal1, index_literal2)
+            create_OR_gate(graph, index_vertex, index_literal1, index_literal2, flag=False)
             create_OR_gate(graph, index_vertex + 3, index_vertex + 2, index_literal3)
             index_vertex += 6
     
@@ -107,7 +107,7 @@ def search_literal(G: dict, literal: str) -> int:
             break
     return index_literal
 
-def create_OR_gate(G: dict, index: int, input1: int, input2: int):
+def create_OR_gate(G: dict, index: int, input1: int, input2: int, flag: bool=True):
     """
     Cria as portas-OR de vértices no grafo.
 
@@ -135,8 +135,9 @@ def create_OR_gate(G: dict, index: int, input1: int, input2: int):
     G["E"].append((input2, index + 1))
     
     # Conecta a saída aos vértices F e B
-    G["E"].append((index + 2, 1))
-    G["E"].append((index + 2, 2))
+    if flag:
+        G["E"].append((index + 2, 1))
+        G["E"].append((index + 2, 2))
 
 def is_safe(G: dict, v: int, color) -> bool:
     """
