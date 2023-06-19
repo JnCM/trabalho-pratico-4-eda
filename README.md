@@ -9,4 +9,4 @@ python <nome do arquivo>.py
 ```
 Em que `<nome do arquivo>` pode ser alterado para `NPProof` para o caso da execução da prova que o problema da 3-coloração é NP, ou para `NPCompleteProof` caso queira executar a prova que o problema da 3-coloração é NP-Completo.
 
-Das linhas 273 à 276 do arquivo ``NPCompleteProof.py` podem ser comentadas ou descomentadas expressões booleanas de entrada para o problema.
+Das linhas 288 à 291 do arquivo ``NPCompleteProof.py` podem ser comentadas ou descomentadas expressões booleanas de entrada para o problema.
