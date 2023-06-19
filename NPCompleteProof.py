@@ -44,111 +44,74 @@ def f1(Ip: str) -> tuple:
     # e conecta-os com o vértice base (B) formando triângulos
     # (xi - ~xi - B - xi)
     for literal in literals:
-        new_vertex = Vertex(literal)
-        new_vertex_neg = Vertex("~" + literal)
-        graph["V"].append(new_vertex)
-        graph["V"].append(new_vertex_neg)
-
+        graph["V"].append(Vertex(literal))
+        graph["V"].append(Vertex("~" + literal))
+        # Triângulo entre os vértices xi, ~xi e B
         graph["E"].append((index_vertex, index_vertex + 1))
         graph["E"].append((index_vertex, 2))
         graph["E"].append((index_vertex + 1, 2))
-
         index_vertex += 2
 
     # Cria as portas OR de cada cláusula
     for clausule in clausules:
-        literals = clausule.split(" OR ")
-        if len(literals) == 1:
+        literals_of_c = clausule.split(" OR ")
+        if len(literals_of_c) == 1:
             # Cláusula com 1 literal (x): O vértice do literal é automaticamente conectado
             # com o vértice False (F), para ser verdadeiro
-            index_literal1 = -1
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[0]:
-                    index_literal1 = i
-                    break
-            
+            index_literal1 = search_literal(graph, literals_of_c[0])
             graph["E"].append((index_literal1, 1))
-        elif len(literals) == 2:
+        elif len(literals_of_c) == 2:
             # Cláusula com 2 literais (x V y): Cria uma porta OR de vértices formando um triângulo
             # (input1 - input2 - output - input1) de maneira que o vértice x é conectado a uma
             # entrada, o vértice y à outra e a saída é conectada aos vértices (B) e (F),
             # obrigando a saída da cláusula ser verdadeira
-            index_literal1 = -1
-            index_literal2 = -1
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[0]:
-                    index_literal1 = i
-                    break
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[1]:
-                    index_literal2 = i
-                    break
+            index_literal1 = search_literal(graph, literals_of_c[0])
+            index_literal2 = search_literal(graph, literals_of_c[1])
             
-            graph["V"].append(Vertex("inp1"))
-            graph["V"].append(Vertex("inp2"))
-            graph["V"].append(Vertex("out"))
-
-            graph["E"].append((index_vertex, index_vertex + 1))
-            graph["E"].append((index_vertex, index_vertex + 2))
-            graph["E"].append((index_vertex + 1, index_vertex + 2))
-            
-            graph["E"].append((index_literal1, index_vertex))
-            graph["E"].append((index_literal2, index_vertex + 1))
-            
-            graph["E"].append((index_vertex + 2, 1))
-            graph["E"].append((index_vertex + 2, 2))
-
+            create_OR_gate(graph, index_vertex, index_literal1, index_literal2)
             index_vertex += 3
-        elif len(literals) == 3:
+        elif len(literals_of_c) == 3:
             # Cláusula com 3 literais ((x V y) V z): Cria duas portas OR, uma conectando dois literais e
             # outra conectando a saída da primeira porta em uma entrada e o último literal em outra
             # e conectando a última saída nos vértices (B) e (F) para a cláusula ser verdadeira
-            index_literal1 = -1
-            index_literal2 = -1
-            index_literal3 = -1
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[0]:
-                    index_literal1 = i
-                    break
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[1]:
-                    index_literal2 = i
-                    break
-            for i in range(len(graph["V"])):
-                if graph["V"][i].get_name() == literals[2]:
-                    index_literal3 = i
-                    break
+            index_literal1 = search_literal(graph, literals_of_c[0])
+            index_literal2 = search_literal(graph, literals_of_c[1])
+            index_literal3 = search_literal(graph, literals_of_c[2])
             
-            graph["V"].append(Vertex("inp1"))
-            graph["V"].append(Vertex("inp2"))
-            graph["V"].append(Vertex("out"))
-
-            graph["V"].append(Vertex("inp1"))
-            graph["V"].append(Vertex("inp2"))
-            graph["V"].append(Vertex("out"))
-
-            graph["E"].append((index_vertex, index_vertex + 1))
-            graph["E"].append((index_vertex, index_vertex + 2))
-            graph["E"].append((index_vertex + 1, index_vertex + 2))
-            
-            graph["E"].append((index_literal1, index_vertex))
-            graph["E"].append((index_literal2, index_vertex + 1))
-
-            graph["E"].append((index_vertex + 2, index_vertex + 3))
-            graph["E"].append((index_literal3, index_vertex + 4))
-            
-            graph["E"].append((index_vertex + 3, index_vertex + 4))
-            graph["E"].append((index_vertex + 3, index_vertex + 5))
-            graph["E"].append((index_vertex + 4, index_vertex + 5))
-            
-            graph["E"].append((index_vertex + 5, 1))
-            graph["E"].append((index_vertex + 5, 2))
-
+            create_OR_gate(graph, index_vertex, index_literal1, index_literal2)
+            create_OR_gate(graph, index_vertex + 3, index_vertex + 2, index_literal3)
             index_vertex += 6
     
     # Retorna uma instância do problema 3-coloração
     # Um grafo G e um conjunto de 3 cores (True, False, None)
     return graph, [True, False, None]
+
+def search_literal(G: dict, literal: str):
+    index_literal = -1
+    for i in range(len(G["V"])):
+        if G["V"][i].get_name() == literal:
+            index_literal = i
+            break
+    return index_literal
+
+def create_OR_gate(G: dict, index: int, input1: int, input2: int):
+    # Vértice intermediário
+    G["V"].append(Vertex("inp1"))
+    G["V"].append(Vertex("inp2"))
+    G["V"].append(Vertex("out"))
+    
+    # Cria o triângulo dos vértices intermediários
+    G["E"].append((index, index + 1))
+    G["E"].append((index, index + 2))
+    G["E"].append((index + 1, index + 2))
+    
+    # Conecta as entradas
+    G["E"].append((input1, index))
+    G["E"].append((input2, index + 1))
+    
+    # Conecta a saída aos vértices F e B
+    G["E"].append((index + 2, 1))
+    G["E"].append((index + 2, 2))
 
 def is_safe(G: dict, v: int, color) -> bool:
     """
