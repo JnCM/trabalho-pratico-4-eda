@@ -86,7 +86,20 @@ def f1(Ip: str) -> tuple:
     # Um grafo G e um conjunto de 3 cores (True, False, None)
     return graph, [True, False, None]
 
-def search_literal(G: dict, literal: str):
+def search_literal(G: dict, literal: str) -> int:
+    """
+    Encontra o índice do vértice de um literal no grafo.
+
+    Parâmetros
+    ----------
+        - G (dict): Grafo de entrada;
+        - literal (str): Literal a ser pesquisado.
+    
+    Retorno
+    -------
+        - index (int): Índice do vértice do literal.
+    """
+
     index_literal = -1
     for i in range(len(G["V"])):
         if G["V"][i].get_name() == literal:
@@ -95,6 +108,18 @@ def search_literal(G: dict, literal: str):
     return index_literal
 
 def create_OR_gate(G: dict, index: int, input1: int, input2: int):
+    """
+    Cria as portas-OR de vértices no grafo.
+
+    Parâmetros
+    ----------
+        - G (dict): Grafo de entrada;
+        - index (int): Índice do primeiro vértice intermediário que
+        será criado para a porta;
+        - input1 (int): Índice do vértice de primeira entrada;
+        - input2 (int): Índice do vértice de segunda entrada.
+    """
+    
     # Vértice intermediário
     G["V"].append(Vertex("inp1"))
     G["V"].append(Vertex("inp2"))
@@ -156,6 +181,11 @@ def backtracking_3colorable(G: dict, C: list, idx_vertex: int, init: int):
         - C (list): Lista de tamanho K = 3 contendo as cores possíves;
         - idx_vertex (int): Índice do vértice atual;
         - init (int): Posição do vértice colorido inicialmente.
+    
+    Retorno
+    -------
+        - result (bool): Verdadeiro caso a coloração ocorra com sucesso,
+        ou falso caso o contrário.
     """
 
     # Condição de parada: Atingir o último
@@ -226,6 +256,22 @@ def f2(Sq: dict) -> bool:
     return Sp
 
 def verify_solution(Ip: str, Sp: list):
+    """
+    Método que verifica a solução para o 3-SAT com base na coloração
+    do grafo. Verifica se há pelo menos um literal em cada cláusula de
+    valor verdadeiro.
+
+    Parâmetros
+    ----------
+        - Ip (str): Expressão booleana na Forma Normal Conjuntiva;
+        - Sp (list): Saída gerada para o 3-SAT com base na coloração do grafo.
+    
+    Retorno
+    -------
+        - result (bool): Verdadeiro caso a expressão seja verdadeira, ou falso
+        caso o contrário.
+    """
+
     clausules = Ip.split(" AND ")
     for clausule in clausules:
         literals = clausule.replace("(", "").replace(")", "").split(" OR ")
