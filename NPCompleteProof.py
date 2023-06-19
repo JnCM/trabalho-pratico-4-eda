@@ -7,7 +7,7 @@ def f1(Ip: str) -> tuple:
 
     Parâmetros
     ----------
-        - Ip (str): Expressão booleana na Forma Normal Conjutiva.
+        - Ip (str): Expressão booleana na Forma Normal Conjuntiva.
         Deve ser da forma: (x OR y) AND (w OR z OR ~x).
     
     Retorno
@@ -249,19 +249,31 @@ def f2(Sq: dict) -> bool:
     not_literals = ["T", "F", "B", "inp1", "inp2", "out"]
     Sp = []
 
-    print("\nValores de literais para o 3-SAT:")
     for v in Sq["V"]:
         if v.get_name() not in not_literals:
-            print("{} = {}".format(v.get_name(), v.get_color()))
             if v.get_color():
                 Sp.append(v.get_name())
 
     return Sp
 
+def verify_solution(Ip: str, Sp: list):
+    clausules = Ip.split(" AND ")
+    for clausule in clausules:
+        literals = clausule.replace("(", "").replace(")", "").split(" OR ")
+        check_one = False
+        for literal in literals:
+            if literal in Sp:
+                check_one = True
+                break
+        if not check_one:
+            return False
+    return True
+
 if __name__ == "__main__":
     # Ip = "(x) AND (x OR y OR z) AND (z)"
-    Ip = "(u OR ~v OR w) AND (v OR x OR ~y)"
+    # Ip = "(u OR ~v OR w) AND (v OR x OR ~y)"
     # Ip = "(u OR v OR w)"
+    Ip = "(v) AND (u OR v OR w) AND (u OR w)"
 
     # Mapeamento da entrada do problema 3-SAT
     # para uma entrada do problema da 3-coloração
@@ -272,3 +284,5 @@ if __name__ == "__main__":
     # Tradução da saída da resolução do problema
     # da 3-coloração para uma saída do problema 3-SAT
     Sp = f2(Sq)
+    # Verificação se a redução ocorreu com sucesso
+    print("\nResultado do 3-SAT: {}".format(verify_solution(Ip, Sp)))
